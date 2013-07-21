@@ -1,7 +1,16 @@
 package com.untamedears.recivchat;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -30,11 +39,20 @@ public class CivChat extends JavaPlugin implements Listener {
 	public void onEnable() {
 		instance = this;
 		
+		if(!this.getDataFolder().isDirectory())
+			this.getDataFolder().mkdir();
+		
 		Bukkit.getPluginManager().registerEvents(this, this);
+		
+		this.getLogger().info("Loading ignore lists...");
+		int ignores = loadIgnoreLists();
+		this.getLogger().info("Loaded " + ignores + " entries.");
 	}
 	
 	public void onDisable() {
-		
+		this.getLogger().info("Saving ignore lists...");
+		int ignores = saveIgnoreLists();
+		this.getLogger().info("Saved " + ignores + " entries.");
 	}
 	
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -159,7 +177,40 @@ public class CivChat extends JavaPlugin implements Listener {
 			}
 		}
 		else if(command.getName().equals("ignore")) {
-			
+			if(args.length == 0) {
+				ArrayList<String> ignoreList = playerManager.getIgnoreList(sender.getName());
+				
+				if(ignoreList.size() == 0) {
+					sender.sendMessage(ChatColor.YELLOW + "You are currently ignoring no one.");
+				}
+				else {
+					String all = "";
+					
+					for(int i = 0; i < ignoreList.size(); i++) {
+						all += ignoreList.get(i);
+						
+						if(i < ignoreList.size() - 1) {
+							all += " ";
+						}
+					}
+					
+					sender.sendMessage(ChatColor.YELLOW + "You are currently ignoring the following player(s): " + all);
+				}
+			}
+			else {
+				OfflinePlayer player = Bukkit.getOfflinePlayer(args[0]);
+				
+				if(playerManager.isIgnoring(sender.getName(), player.getName())) {
+					sender.sendMessage(ChatColor.YELLOW + "You are no longer ignoring " + player.getName() + ".");
+					
+					playerManager.removeIgnored(sender.getName(), player.getName());
+				}
+				else {
+					sender.sendMessage(ChatColor.YELLOW + "You are now ignoring " + player.getName() + ".");
+					
+					playerManager.addIgnore(sender.getName(), player.getName());
+				}
+			}
 		}
 		else if(command.getName().equals("civchat")) {
 			
@@ -187,5 +238,68 @@ public class CivChat extends JavaPlugin implements Listener {
 	
 	public static int getChatRange() {
 		return chatRange;
+	}
+	
+	private int loadIgnoreLists() {
+		File file = new File(this.getDataFolder(), "ignoreList.txt");
+		
+		if(file.isFile()) {
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader(file));
+				
+				int ignores = 0;
+				String line;
+				
+				while((line = reader.readLine()) != null) {
+					String[] parts = line.split(" ");
+					
+					if(parts.length == 2) {
+						playerManager.addIgnore(parts[0], parts[1]);
+						
+						ignores++;
+					}
+				}
+				
+				reader.close();
+				
+				return ignores;
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return 0;
+	}
+	
+	private int saveIgnoreLists() {
+		File file = new File(this.getDataFolder(), "ignoreList.txt");
+
+		try {
+			if(!file.isFile())
+				file.createNewFile();
+			
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			
+			int ignores = 0;
+			
+			for(String player : playerManager.getIgnoringPlayers()) {
+				for(String ignored : playerManager.getIgnoreList(player)) {
+					writer.write(player + " " + ignored);
+					writer.newLine();
+					
+					ignores++;
+				}
+			}
+			
+			writer.close();
+			
+			return ignores;
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
+		
+		return 0;
 	}
 }

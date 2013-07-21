@@ -1,7 +1,9 @@
 package com.untamedears.recivchat;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.bukkit.entity.Player;
 
@@ -12,6 +14,7 @@ import com.untamedears.recivchat.mode.Replyable;
 public class PlayerManager {
 	private HashMap<String, ChatMode> chatModes = new HashMap<String, ChatMode>();
 	private HashMap<String, Replyable> lastReplyables = new HashMap<String, Replyable>();
+	private HashMap<String, ArrayList<String>> ignoreLists = new HashMap<String, ArrayList<String>>();
 	
 	public PlayerManager() {
 		
@@ -55,5 +58,60 @@ public class PlayerManager {
 	
 	public void removeLastReplyable(String player) {
 		lastReplyables.remove(player);
+	}
+	
+	public boolean isIgnoring(String player, String ignored) {
+		if(ignoreLists.containsKey(player))
+			return ignoreLists.get(player).contains(ignored);
+		else
+			return false;
+	}
+	
+	public void addIgnore(String player, String ignored) {
+		ArrayList<String> ignores;
+		
+		if(ignoreLists.containsKey(player))
+			ignores = ignoreLists.get(player);
+		else {
+			ignores = new ArrayList<String>();
+			ignoreLists.put(player, ignores);
+		}
+		
+		ignores.add(ignored);
+	}
+	
+	public void removeIgnored(String player, String ignored) {
+		ArrayList<String> ignores;
+		
+		if(ignoreLists.containsKey(player)) {
+			ignores = ignoreLists.get(player);
+			
+			ignores.remove(ignored);
+		}
+	}
+	
+	public ArrayList<String> getIgnoreList(String player) {
+		ArrayList<String> ignoreListCopy = new ArrayList<String>();
+		
+		if(ignoreLists.containsKey(player)) {
+			ignoreListCopy.addAll(ignoreLists.get(player));
+		}
+		
+		return ignoreListCopy;
+	}
+	
+	public void setIgnoreList(String player, Collection<String> ignores) {
+		ArrayList<String> ignoreList = new ArrayList<String>();
+		ignoreList.addAll(ignores);
+		
+		ignoreLists.put(player, ignoreList);
+	}
+	
+	public void removeIgnoreList(String player) {
+		ignoreLists.remove(player);
+	}
+	
+	public Set<String> getIgnoringPlayers() {
+		return ignoreLists.keySet();
 	}
 }

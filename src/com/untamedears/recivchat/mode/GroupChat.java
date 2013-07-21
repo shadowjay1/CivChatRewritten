@@ -53,6 +53,12 @@ public class GroupChat implements ChatMode, Replyable {
 		for(Player recipient : event.getRecipients()) {
 			String recipientName = recipient.getName();
 			
+			if(CivChat.instance.getPlayerManager().isIgnoring(recipientName, sender.getName())) {
+				remove.add(recipient);
+				
+				continue;
+			}
+			
 			if(!group.isMember(recipientName) && !group.isModerator(recipientName) && !group.isFounder(recipientName)) {
 				remove.add(recipient);
 			}
@@ -73,9 +79,7 @@ public class GroupChat implements ChatMode, Replyable {
 		GroupManager groupManager = Citadel.getGroupManager();
 		
 		if(!groupManager.isGroup(groupName)) {
-			sender.sendMessage(ChatColor.YELLOW + "The group you were chatting with no longer exists. You have been moved to normal chat.");
-			
-			CivChat.instance.getPlayerManager().removePlayerChatMode(sender.getName());
+			sender.sendMessage(ChatColor.YELLOW + "The specified group does not exist!");
 			
 			return;
 		}
@@ -83,9 +87,7 @@ public class GroupChat implements ChatMode, Replyable {
 		Faction group = groupManager.getGroup(groupName);
 		
 		if((sender instanceof Player) && (!group.isMember(sender.getName()) && !group.isModerator(sender.getName()) && !group.isFounder(sender.getName()))) {
-			sender.sendMessage(ChatColor.YELLOW + "You are no longer a part of the group you were chatting with. You have been moved to normal chat.");
-			
-			CivChat.instance.getPlayerManager().removePlayerChatMode(sender.getName());
+			sender.sendMessage(ChatColor.YELLOW + "You are not a part of the specified group.");
 			
 			return;
 		}
@@ -97,6 +99,10 @@ public class GroupChat implements ChatMode, Replyable {
 			
 			if(recipient.getName().equals(sender.getName()))
 				continue;
+			
+			if(CivChat.instance.getPlayerManager().isIgnoring(recipient.getName(), sender.getName())) {
+				continue;
+			}
 			
 			if(group.isMember(recipientName) || group.isModerator(recipientName) || group.isFounder(recipientName)) {
 				recipients.add(recipient);

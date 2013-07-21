@@ -21,6 +21,16 @@ public class MessageChat implements ChatMode, Replyable {
 		Player player = Bukkit.getPlayerExact(recipient);
 		
 		if(player != null) {
+			if(CivChat.instance.getPlayerManager().isIgnoring(recipient, player.getName())) {
+				sender.sendMessage(ChatColor.YELLOW + "This player is ignoring you. You have been returned to normal chat.");
+				
+				CivChat.instance.getPlayerManager().removePlayerChatMode(sender.getName());
+				
+				event.setCancelled(true);
+				
+				return;
+			}
+			
 			event.getRecipients().clear();
 			event.getRecipients().add(player);
 			
@@ -44,6 +54,12 @@ public class MessageChat implements ChatMode, Replyable {
 		Player player = Bukkit.getPlayerExact(recipient);
 		
 		if(player != null) {
+			if(CivChat.instance.getPlayerManager().isIgnoring(recipient, player.getName())) {
+				sender.sendMessage(ChatColor.YELLOW + "This player is ignoring you.");
+				
+				return;
+			}
+			
 			player.sendMessage(ChatColor.DARK_PURPLE + "From " + sender.getName() + ": " + message);
 			
 			CivChat.instance.getPlayerManager().updateLastReplyable(recipient, this);
@@ -51,9 +67,7 @@ public class MessageChat implements ChatMode, Replyable {
 			sender.sendMessage(ChatColor.DARK_PURPLE + "To " + recipient + ": " + message);
 		}
 		else {
-			sender.sendMessage(ChatColor.YELLOW + "This player is no longer online. You have been returned to normal chat.");
-			
-			CivChat.instance.getPlayerManager().removePlayerChatMode(sender.getName());
+			sender.sendMessage(ChatColor.YELLOW + "The specified player is not online.");
 		}
 	}
 

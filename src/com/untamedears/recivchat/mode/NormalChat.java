@@ -23,6 +23,12 @@ public class NormalChat implements ChatMode {
 		int chatRange = CivChat.getChatRange();
 		
 		for(Player recipient : event.getRecipients()) {
+			if(CivChat.instance.getPlayerManager().isIgnoring(recipient.getName(), player.getName())) {
+				remove.add(recipient);
+				
+				continue;
+			}
+			
 			double dist = playerLoc.distance(recipient.getLocation());
 			
 			if(dist > chatRange) {
@@ -49,6 +55,10 @@ public class NormalChat implements ChatMode {
 		for(Player recipient : Bukkit.getOnlinePlayers()) {
 			if(!player.getWorld().getName().equals(recipient.getWorld().getName()))
 				continue;
+			
+			if(CivChat.instance.getPlayerManager().isIgnoring(recipient.getName(), player.getName())) {
+				continue;
+			}
 			
 			double dist = playerLoc.distance(recipient.getLocation());
 			
