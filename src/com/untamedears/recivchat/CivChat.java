@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -33,6 +34,9 @@ public class CivChat extends JavaPlugin implements Listener {
 	public static CivChat instance;
 	
 	private static int chatRange = 1000;
+	private static int shoutRange = 1500;
+	private static float shoutExhaustion = 5.0F;
+	private static int whisperRange = 50;
 	
 	private PlayerManager playerManager = new PlayerManager();
 	
@@ -47,6 +51,18 @@ public class CivChat extends JavaPlugin implements Listener {
 		this.getLogger().info("Loading ignore lists...");
 		int ignores = loadIgnoreLists();
 		this.getLogger().info("Loaded " + ignores + " entries.");
+		
+		chatRange = this.getConfig().getInt("chatRange", 1000);
+		shoutRange = this.getConfig().getInt("shoutRange", 1500);
+		shoutExhaustion = (float) this.getConfig().getDouble("shoutExhaustion", 5.0F);
+		whisperRange = this.getConfig().getInt("whisperRange", 50);
+		
+		this.getConfig().set("chatRange", chatRange);
+		this.getConfig().set("shoutRange", shoutRange);
+		this.getConfig().set("shoutExhaustion", (double) shoutExhaustion);
+		this.getConfig().set("whisperRange", whisperRange);
+		
+		this.saveConfig();
 	}
 	
 	public void onDisable() {
@@ -212,8 +228,116 @@ public class CivChat extends JavaPlugin implements Listener {
 				}
 			}
 		}
-		else if(command.getName().equals("civchat")) {
+		else if(command.getName().equals("shout")) {
+			if(!(sender instanceof Player)) {
+				sender.sendMessage(ChatColor.YELLOW + "This command cannot be run from the console.");
+				
+				return true;
+			}
 			
+			Player player = (Player) sender;
+			
+			if(args.length < 1) {
+				sender.sendMessage(ChatColor.YELLOW + "Usage: " + command.getUsage());
+				
+				return true;
+			}
+			
+			if(player.getFoodLevel() <= 6) {
+				player.sendMessage(ChatColor.YELLOW + "You are too hungry to shout!");
+				
+				return true;
+			}
+			
+			player.setExhaustion(player.getExhaustion() + shoutExhaustion);
+			
+			String message = "";
+			
+			for(int i = 0; i < args.length; i++) {
+				message += args[i];
+				
+				if(i < args.length - 1) {
+					message += " ";
+				}
+			}
+			
+			Location playerLoc = player.getLocation();
+			
+			ArrayList<Player> recipients = new ArrayList<Player>();
+			
+			for(Player recipient : player.getWorld().getPlayers()) {
+				if(CivChat.instance.getPlayerManager().isIgnoring(recipient.getName(), player.getName())) {
+					continue;
+				}
+				
+				double dist = playerLoc.distance(recipient.getLocation());
+				
+				if(dist <= whisperRange) {
+					recipients.add(recipient);
+				}
+			}
+			
+			for(Player recipient : recipients) {
+				recipient.sendMessage(player.getName() + ": " + message);
+			}
+		}
+		else if(command.getName().equals("whisper")) {
+			if(!(sender instanceof Player)) {
+				sender.sendMessage(ChatColor.YELLOW + "This command cannot be run from the console.");
+				
+				return true;
+			}
+			
+			Player player = (Player) sender;
+			
+			if(args.length < 1) {
+				sender.sendMessage(ChatColor.YELLOW + "Usage: " + command.getUsage());
+				
+				return true;
+			}
+			
+			String message = "";
+			
+			for(int i = 0; i < args.length; i++) {
+				message += args[i];
+				
+				if(i < args.length - 1) {
+					message += " ";
+				}
+			}
+			
+			Location playerLoc = player.getLocation();
+			
+			ArrayList<Player> recipients = new ArrayList<Player>();
+			
+			for(Player recipient : player.getWorld().getPlayers()) {
+				if(CivChat.instance.getPlayerManager().isIgnoring(recipient.getName(), player.getName())) {
+					continue;
+				}
+				
+				double dist = playerLoc.distance(recipient.getLocation());
+				
+				if(dist <= whisperRange) {
+					recipients.add(recipient);
+				}
+			}
+			
+			for(Player recipient : recipients) {
+				recipient.sendMessage(player.getName() + ": " + message);
+			}
+		}
+		else if(command.getName().equals("civchat")) {
+			if(args.length == 1) {
+				if(args[0].equals("load")) {
+					this.reloadConfig();
+				}
+				else {
+					sender.sendMessage(ChatColor.YELLOW + "Usage: " + command.getUsage());
+				}
+			}
+			else {
+				sender.sendMessage(ChatColor.YELLOW + "Usage: " + command.getUsage());
+			}
 		}
 		
 		return true;

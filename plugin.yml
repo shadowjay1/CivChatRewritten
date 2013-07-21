@@ -19,9 +19,16 @@ commands:
     description: Ignore a player.
     usage: /<command> <player>
   civchat:
-    description: Commands for loading/saving config.
-    usage: /<command> <subcommand>
+    description: Administrator commands.
+    usage: /<command> <load>
     permission: civchat.admin
+  shout:
+    description: Shout to increase your chat range!
+    usage: /<command> <message>
+  whisper:
+    description: Whisper to only chat with people in a small radius of you.
+    usage: /<command> <message>
+
 permissions:
   civchat.admin:
     description: Admin commands for ReCivChat.
