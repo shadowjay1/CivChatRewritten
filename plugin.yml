@@ -1,0 +1,28 @@
+name: CivChatRewritten
+main: com.untamedears.recivchat.CivChat
+version: 0.1
+author: shadowjay1
+commands:
+  msg:
+    description: Enter into a conversation with another player.
+    usage: /<command> [player] [message]
+    aliases: [message, m, tell, pm]
+  groupchat:
+    description: Command for talking to everyone in a Citadel group.
+    usage: /<command> [group] [message]
+    aliases: [g, group]
+  reply:
+    description: Reply to the last player who messaged you.
+    usage: /<command> <message>
+    aliases: [r]
+  ignore:
+    description: Ignore a player.
+    usage: /<command> <player>
+  civchat:
+    description: Commands for loading/saving config.
+    usage: /<command> <subcommand>
+    permission: civchat.admin
+permissions:
+  civchat.admin:
+    description: Admin commands for ReCivChat.
+    default: op
