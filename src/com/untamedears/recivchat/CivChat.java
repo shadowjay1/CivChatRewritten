@@ -419,8 +419,8 @@ public class CivChat extends JavaPlugin implements Listener {
 				while((line = reader.readLine()) != null) {
 					String[] parts = line.split(" ");
 					
-					if(parts.length == 2) {
-						playerManager.addIgnore(parts[0], parts[1]);
+					for(int i = 1; i < parts.length; i++) {
+						playerManager.addIgnore(parts[0], parts[i]);
 						
 						ignores++;
 					}
@@ -450,12 +450,21 @@ public class CivChat extends JavaPlugin implements Listener {
 			int ignores = 0;
 			
 			for(String player : playerManager.getIgnoringPlayers()) {
-				for(String ignored : playerManager.getIgnoreList(player)) {
-					writer.write(player + " " + ignored);
-					writer.newLine();
+				String all = "";
+				
+				ArrayList<String> ignoreList = playerManager.getIgnoreList(player);
+				
+				for(int i = 0; i < ignoreList.size(); i++) {
+					all += ignoreList.get(i);
+					
+					if(i < ignoreList.size() - 1)
+						all += " ";
 					
 					ignores++;
 				}
+				
+				writer.write(player + " " + all);
+				writer.newLine();
 			}
 			
 			writer.close();
