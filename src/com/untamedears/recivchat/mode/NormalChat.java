@@ -38,6 +38,8 @@ public class NormalChat implements ChatMode {
 		
 		event.getRecipients().removeAll(remove);
 		event.setFormat("%s: %s");
+		
+		CivChat.instance.logChatLine("[n] " + player.getName() + ": " + event.getMessage());
 	}
 	
 	@Override
@@ -70,5 +72,7 @@ public class NormalChat implements ChatMode {
 		for(Player recipient : recipients) {
 			recipient.sendMessage(sender.getName() + ": " + message);
 		}
+		
+		CivChat.instance.logChatLine("[n] " + player.getName() + ": " + message);
 	}
 }

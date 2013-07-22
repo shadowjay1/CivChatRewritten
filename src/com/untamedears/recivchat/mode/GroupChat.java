@@ -72,6 +72,8 @@ public class GroupChat implements ChatMode, Replyable {
 		CivChat.instance.getPlayerManager().updateLastReplyables(event.getRecipients(), this);
 		
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "To " + groupName + ": " + event.getMessage());
+		
+		CivChat.instance.logChatLine("[p->g] " + sender.getName() + " -> " + group.getName() + ": " + event.getMessage());
 	}
 
 	@Override
@@ -116,6 +118,8 @@ public class GroupChat implements ChatMode, Replyable {
 		CivChat.instance.getPlayerManager().updateLastReplyables(recipients, this);
 		
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "To " + group.getName() + ": " + message);
+		
+		CivChat.instance.logChatLine("[p->g] " + sender.getName() + " -> " + group.getName() + ": " + message);
 	}
 
 	@Override

@@ -6,7 +6,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -40,11 +43,32 @@ public class CivChat extends JavaPlugin implements Listener {
 	
 	private PlayerManager playerManager = new PlayerManager();
 	
+	private PrintWriter logWriter = null;
+	
 	public void onEnable() {
 		instance = this;
 		
 		if(!this.getDataFolder().isDirectory())
 			this.getDataFolder().mkdir();
+		
+		File logFolder = new File(this.getDataFolder(), "logs");
+		
+		try {
+			if(!logFolder.isDirectory())
+				logFolder.mkdir();
+			
+			String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+			
+			File logFile = new File(logFolder, date + ".txt");
+			
+			if(!logFile.isFile())
+				logFile.createNewFile();
+			
+			logWriter = new PrintWriter(new FileWriter(logFile, true));
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
 		
 		Bukkit.getPluginManager().registerEvents(this, this);
 		
@@ -354,6 +378,16 @@ public class CivChat extends JavaPlugin implements Listener {
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		playerManager.removePlayerChatMode(event.getPlayer().getName());
 		playerManager.removeLastReplyable(event.getPlayer().getName());
+	}
+	
+	public void logChat(String log) {
+		logWriter.print(log);
+		logWriter.flush();
+	}
+	
+	public void logChatLine(String log) {
+		logWriter.println(log);
+		logWriter.flush();
 	}
 	
 	public PlayerManager getPlayerManager() {

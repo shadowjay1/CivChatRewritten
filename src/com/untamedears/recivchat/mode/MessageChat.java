@@ -39,6 +39,8 @@ public class MessageChat implements ChatMode, Replyable {
 			CivChat.instance.getPlayerManager().updateLastReplyable(recipient, this);
 			
 			sender.sendMessage(ChatColor.DARK_PURPLE + "To " + recipient + ": " + event.getMessage());
+			
+			CivChat.instance.logChatLine("[p->p] " + sender.getName() + " -> " + player.getName() + ": " + event.getMessage());
 		}
 		else {
 			sender.sendMessage(ChatColor.YELLOW + "This player is no longer online. You have been returned to normal chat.");
@@ -65,6 +67,8 @@ public class MessageChat implements ChatMode, Replyable {
 			CivChat.instance.getPlayerManager().updateLastReplyable(recipient, this);
 			
 			sender.sendMessage(ChatColor.DARK_PURPLE + "To " + recipient + ": " + message);
+			
+			CivChat.instance.logChatLine("[p->p] " + sender.getName() + " -> " + player.getName() + ": " + message);
 		}
 		else {
 			sender.sendMessage(ChatColor.YELLOW + "The specified player is not online.");
