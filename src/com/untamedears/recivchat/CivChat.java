@@ -51,7 +51,7 @@ public class CivChat extends JavaPlugin implements Listener {
 		if(!this.getDataFolder().isDirectory())
 			this.getDataFolder().mkdir();
 		
-		File logFolder = new File(this.getDataFolder(), "logs");
+		File logFolder = getLogFolder();
 		
 		try {
 			if(!logFolder.isDirectory())
@@ -85,8 +85,12 @@ public class CivChat extends JavaPlugin implements Listener {
 		this.getConfig().set("shoutRange", shoutRange);
 		this.getConfig().set("shoutExhaustion", (double) shoutExhaustion);
 		this.getConfig().set("whisperRange", whisperRange);
+		this.getConfig().set("logs.compression.zipSize", this.getConfig().getInt("logs.compression.zipSize", 5));
+		this.getConfig().set("logs.compression.keepMinimum", this.getConfig().getInt("logs.compression.keepMinimum", 5));
 		
 		this.saveConfig();
+		
+		new Thread(new LogCompressionRunnable()).start();
 	}
 	
 	public void onDisable() {
@@ -396,6 +400,10 @@ public class CivChat extends JavaPlugin implements Listener {
 	
 	public static int getChatRange() {
 		return chatRange;
+	}
+	
+	public File getLogFolder() {
+		return new File(this.getDataFolder(), "logs");
 	}
 	
 	private int loadIgnoreLists() {
