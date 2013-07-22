@@ -113,7 +113,7 @@ public class CivChat extends JavaPlugin implements Listener {
 				Player player = Bukkit.getPlayer(args[0]);
 				
 				if(player != null) {
-					playerManager.setChatMode(sender.getName(), new MessageChat(player.getName()));
+					playerManager.setChatMode(sender.getName(), new MessageChat(sender.getName(), player.getName()));
 					
 					sender.sendMessage(ChatColor.YELLOW + "You are now in a conversation with " + player.getName() + ".");
 				}
@@ -125,7 +125,7 @@ public class CivChat extends JavaPlugin implements Listener {
 				Player player = Bukkit.getPlayer(args[0]);
 				
 				if(player != null) {
-					MessageChat chat = new MessageChat(player.getName());
+					MessageChat chat = new MessageChat(sender.getName(), player.getName());
 					
 					String message = "";
 					
@@ -177,7 +177,7 @@ public class CivChat extends JavaPlugin implements Listener {
 				if(groupManager.isGroup(args[0])) {
 					Faction group = groupManager.getGroup(args[0]);
 					
-					MessageChat chat = new MessageChat(group.getName());
+					GroupChat chat = new GroupChat(group.getName());
 					
 					String message = "";
 					

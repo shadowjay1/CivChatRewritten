@@ -1,6 +1,6 @@
 name: CivChatRewritten
 main: com.untamedears.recivchat.CivChat
-version: 0.1
+version: 0.2
 author: shadowjay1
 commands:
   msg:

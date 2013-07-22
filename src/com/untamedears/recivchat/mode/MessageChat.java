@@ -9,9 +9,11 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import com.untamedears.recivchat.CivChat;
 
 public class MessageChat implements ChatMode, Replyable {
+	private String sender;
 	private String recipient;
 	
-	public MessageChat(String recipient) {
+	public MessageChat(String sender, String recipient) {
+		this.sender = sender;
 		this.recipient = recipient;
 	}
 
@@ -77,6 +79,6 @@ public class MessageChat implements ChatMode, Replyable {
 
 	@Override
 	public ChatMode getReplyChat() {
-		return new MessageChat(recipient);
+		return new MessageChat(recipient, sender);
 	}
 }
